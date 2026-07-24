@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Varal do Bebê — Bazar de roupinhas usadas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sage:#EDF2E6;
+    --linen:#FBF8F2;
+    --pine:#24352A;
+    --pine-80:#2f4536;
+    --honey:#D9A441;
+    --honey-dark:#B9812C;
+    --rose:#E7A9A0;
+    --rose-dark:#d98a7e;
+    --moss:#6B7F6C;
+    --line:#D8E0D2;
+    --danger:#B5514A;
+    --radius:16px;
+    --shadow: 0 6px 20px rgba(36,53,42,0.08);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--sage);
+    color:var(--pine);
+    font-family:'Nunito Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3, .display{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    margin:0;
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit;}
+  button{font-family:inherit; cursor:pointer;}
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{
+    outline:3px solid var(--honey);
+    outline-offset:2px;
+  }
+  .wrap{max-width:1080px; margin:0 auto; padding:0 20px;}
+
+  /* HEADER */
+  header{
+    background:var(--pine);
+    color:var(--linen);
+    padding:16px 0;
+    position:sticky; top:0; z-index:40;
+  }
+  header .wrap{display:flex; align-items:center; justify-content:space-between; gap:12px;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand svg{width:30px; height:30px; flex-shrink:0;}
+  .brand span{font-family:'Fraunces', serif; font-size:22px; font-weight:700;}
+  #cartBtn{
+    background:var(--honey); color:var(--pine); border:none; border-radius:999px;
+    padding:10px 18px; font-weight:800; display:flex; align-items:center; gap:8px;
+    box-shadow:var(--shadow);
+  }
+  #cartBtn:hover{background:var(--honey-dark);}
+  #cartCount{background:var(--pine); color:var(--linen); border-radius:999px; min-width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; font-size:13px; padding:0 6px;}
+
+  /* HERO */
+  .hero{
+    padding:56px 0 40px;
+    text-align:center;
+    overflow:hidden;
+  }
+  .hero h1{font-size:clamp(32px, 5vw, 52px); line-height:1.05;}
+  .hero p.sub{max-width:520px; margin:14px auto 0; color:var(--moss); font-size:17px;}
+  .clothesline{
+    margin:44px auto 8px; max-width:760px; width:100%;
+    display:block;
+  }
+  .cta-row{margin-top:26px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--pine); color:var(--linen); border:none; padding:14px 26px;
+    border-radius:999px; font-weight:800; font-size:15px; box-shadow:var(--shadow);
+  }
+  .btn-primary:hover{background:var(--pine-80);}
+  .btn-ghost{
+    background:transparent; border:2px solid var(--pine); color:var(--pine);
+    padding:12px 24px; border-radius:999px; font-weight:800; font-size:15px;
+  }
+  .btn-ghost:hover{background:rgba(36,53,42,0.06);}
+
+  /* CATALOG */
+  .catalog-section{padding:10px 0 70px;}
+  .catalog-head{display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:18px; flex-wrap:wrap;}
+  .catalog-head h2{font-size:26px;}
+  .filters{
+    display:flex; gap:10px; overflow-x:auto; padding:6px 2px 18px; margin-bottom:6px;
+    scrollbar-width:thin;
+  }
+  .tag-chip{
+    position:relative;
+    flex:0 0 auto;
+    background:var(--linen);
+    border:1.5px solid var(--line);
+    color:var(--pine);
+    padding:8px 16px 8px 22px;
+    border-radius:8px;
+    font-weight:700;
+    font-size:13.5px;
+    white-space:nowrap;
+  }
+  .tag-chip::before{
+    content:"";
+    position:absolute; left:8px; top:50%; transform:translateY(-50%);
+    width:6px; height:6px; border-radius:50%; background:var(--sage); border:1.5px solid var(--moss);
+  }
+  .tag-chip.active{background:var(--pine); color:var(--linen); border-color:var(--pine);}
+  .tag-chip.active::before{background:var(--honey); border-color:var(--honey);}
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+    gap:20px;
+  }
+  .card{
+    background:var(--linen);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    display:flex; flex-direction:column;
+    border:1px solid var(--line);
+  }
+  .card-photo{
+    aspect-ratio:1/1;
+    background:var(--sage);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    overflow:hidden;
+  }
+  .card-photo img{width:100%; height:100%; object-fit:cover;}
+  .card-body{padding:14px 14px 16px; display:flex; flex-direction:column; gap:8px; flex:1;}
+  .card-body h3{font-size:17px; cursor:pointer;}
+  .price-tag{font-family:'JetBrains Mono', monospace; font-weight:700; font-size:16px; color:var(--pine);}
+  .size-badge{
+    align-self:flex-start;
+    background:var(--rose);
+    color:var(--pine);
+    font-weight:700;
+    font-size:12px;
+    padding:3px 10px;
+    border-radius:999px;
+  }
+  .add-btn{
+    margin-top:auto;
+    background:var(--pine); color:var(--linen); border:none;
+    padding:10px; border-radius:10px; font-weight:700; font-size:14px;
+  }
+  .add-btn:hover{background:var(--pine-80);}
+  .add-btn:disabled{opacity:0.5; cursor:not-allowed;}
+
+  .empty-state{
+    text-align:center; padding:60px 20px; color:var(--moss);
+    background:var(--linen); border-radius:var(--radius); border:1px dashed var(--line);
+  }
+  .empty-state h3{color:var(--pine); margin-bottom:8px;}
+
+  /* DRAWER (cart) */
+  .overlay{
+    position:fixed; inset:0; background:rgba(36,53,42,0.45); z-index:60;
+    display:none;
+  }
+  .overlay.show{display:block;}
+  .drawer{
+    position:fixed; top:0; right:0; height:100%; width:min(400px, 92vw);
+    background:var(--sage); z-index:70; box-shadow:-10px 0 30px rgba(0,0,0,0.15);
+    transform:translateX(100%); transition:transform .25s ease;
+    display:flex; flex-direction:column;
+  }
+  .drawer.show{transform:translateX(0);}
+  .drawer-head{padding:20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line);}
+  .drawer-head h2{font-size:22px;}
+  .icon-btn{background:none; border:none; font-size:20px; color:var(--pine); padding:4px;}
+  .drawer-body{flex:1; overflow-y:auto; padding:16px 20px;}
+  .cart-item{display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); align-items:center;}
+  .cart-item img{width:56px; height:56px; object-fit:cover; border-radius:10px; background:var(--linen);}
+  .cart-item .info{flex:1;}
+  .cart-item .info h4{font-size:14.5px; font-weight:700;}
+  .cart-item .remove{background:none; border:none; color:var(--danger); font-weight:700; font-size:13px;}
+  .drawer-foot{padding:18px 20px; border-top:1px solid var(--line);}
+  .total-row{display:flex; justify-content:space-between; font-weight:800; font-size:18px; margin-bottom:14px;}
+  .checkout-btn{
+    width:100%; background:#25D366; color:#fff; border:none; padding:14px;
+    border-radius:12px; font-weight:800; font-size:15px; display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .checkout-btn:disabled{opacity:0.5; cursor:not-allowed;}
+
+  /* MODAL (product) */
+  .modal{
+    position:fixed; inset:0; z-index:80; display:none;
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .modal.show{display:flex;}
+  .modal-card{
+    background:var(--linen); border-radius:20px; max-width:640px; width:100%;
+    max-height:88vh; overflow-y:auto; box-shadow:var(--shadow); position:relative;
+  }
+  .modal-close{
+    position:absolute; top:14px; right:14px; background:var(--pine); color:var(--linen);
+    border:none; width:32px; height:32px; border-radius:50%; font-size:16px; z-index:2;
+  }
+  .modal-gallery{display:flex; gap:8px; padding:16px; overflow-x:auto;}
+  .modal-gallery img{width:100%; max-width:280px; aspect-ratio:1/1; object-fit:cover; border-radius:14px; flex:0 0 auto; background:var(--sage);}
+  .modal-body{padding:0 24px 28px;}
+  .modal-body h2{font-size:24px; margin-bottom:8px;}
+  .modal-body p{color:var(--pine-80); line-height:1.5; margin:12px 0 20px;}
+
+  /* FOOTER */
+  footer{padding:36px 0 60px; text-align:center; color:var(--moss); font-size:13.5px;}
+  #adminToggle{background:none; border:none; color:var(--moss); text-decoration:underline; font-size:13px; cursor:pointer;}
+
+  /* ADMIN */
+  .admin-panel{
+    max-width:720px; margin:0 auto; padding:40px 20px 90px;
+  }
+  .admin-panel h2{font-size:24px; margin-bottom:6px;}
+  .admin-panel .lead{color:var(--moss); margin-bottom:26px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-weight:700; font-size:14px; margin-bottom:6px;}
+  .field input[type=text], .field input[type=number], .field input[type=password], .field select, .field textarea{
+    width:100%; padding:11px 13px; border-radius:10px; border:1.5px solid var(--line);
+    background:var(--linen); font-family:inherit; font-size:14.5px; color:var(--pine);
+  }
+  .field textarea{resize:vertical; min-height:80px;}
+  .photo-inputs{display:flex; gap:10px; flex-wrap:wrap;}
+  .photo-slot{
+    width:96px; height:96px; border-radius:12px; border:2px dashed var(--line);
+    display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;
+    background:var(--linen); color:var(--moss); font-size:12px; text-align:center;
+  }
+  .photo-slot img{width:100%; height:100%; object-fit:cover;}
+  .photo-slot input{position:absolute; inset:0; opacity:0; cursor:pointer;}
+  .photo-slot .rm{
+    position:absolute; top:3px; right:3px; background:var(--danger); color:#fff; border:none;
+    width:20px; height:20px; border-radius:50%; font-size:11px; z-index:2;
+  }
+  .admin-card-list{margin-top:34px; border-top:1px solid var(--line); padding-top:22px;}
+  .admin-item{
+    display:flex; align-items:center; gap:12px; padding:12px; background:var(--linen);
+    border-radius:12px; margin-bottom:10px; border:1px solid var(--line);
+  }
+  .admin-item img{width:52px; height:52px; border-radius:8px; object-fit:cover; background:var(--sage);}
+  .admin-item .i{flex:1;}
+  .admin-item .i b{display:block; font-size:14.5px;}
+  .admin-item .i span{color:var(--moss); font-size:13px;}
+  .del-btn{background:none; border:1.5px solid var(--danger); color:var(--danger); font-weight:700; font-size:12.5px; padding:7px 12px; border-radius:8px;}
+  .del-btn:hover{background:var(--danger); color:#fff;}
+  .save-btn{background:var(--honey); color:var(--pine); border:none; padding:13px 26px; border-radius:10px; font-weight:800; font-size:15px;}
+  .save-btn:hover{background:var(--honey-dark);}
+  .link-btn{background:none; border:none; color:var(--pine); text-decoration:underline; font-weight:700; font-size:14px;}
+  .pin-box{max-width:340px; margin:60px auto; text-align:center;}
+  .pin-box h2{margin-bottom:6px;}
+  .pin-box p{color:var(--moss); margin-bottom:20px; font-size:14.5px;}
+  .msg{font-size:13.5px; margin-top:8px;}
+  .msg.err{color:var(--danger); font-weight:700;}
+  .msg.ok{color:#2e7d47; font-weight:700;}
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--pine); color:var(--linen); padding:12px 20px; border-radius:999px;
+    font-weight:700; font-size:14px; box-shadow:var(--shadow); z-index:100; opacity:0;
+    transition:all .25s ease; pointer-events:none;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .hidden{display:none !important;}
+
+  @media (max-width:560px){
+    .hero{padding:40px 0 24px;}
+    .clothesline{margin:30px auto 4px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M8 3.5C8 2.67 8.67 2 9.5 2h5C15.33 2 16 2.67 16 3.5V5l4.5 3.2c.6.43.85 1.2.6 1.88l-.9 2.4a1 1 0 0 1-1.35.56L16 11.5V19c0 1.66-1.79 3-4 3s-4-1.34-4-3v-7.5l-2.85 1.54a1 1 0 0 1-1.35-.56l-.9-2.4c-.25-.68 0-1.45.6-1.88L8 5V3.5Z" stroke="#FBF8F2" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      <span id="storeNameHeader">Varal do Bebê</span>
+    </div>
+    <button id="cartBtn" onclick="openCart()">
+      🧺 Sacolinha <span id="cartCount">0</span>
+    </button>
+  </div>
+</header>
+
+<main id="publicView">
+  <section class="hero wrap">
+    <h1 class="display">Roupinha usada,<br>com carinho de sobra.</h1>
+    <p class="sub" id="storeTagline">Peças de bebê seminovas, escolhidas com cuidado, esperando um novo dono pequenininho.</p>
+
+    <svg class="clothesline" viewBox="0 0 760 170" xmlns="http://www.w3.org/2000/svg">
+      <line x1="10" y1="20" x2="750" y2="20" stroke="#6B7F6C" stroke-width="2" stroke-dasharray="1 6" stroke-linecap="round"/>
+      <!-- Body -->
+      <g transform="translate(70,20) rotate(-4)">
+        <circle cx="0" cy="0" r="5" fill="#D9A441"/>
+        <line x1="0" y1="0" x2="0" y2="10" stroke="#D9A441" stroke-width="2"/>
+        <g transform="translate(-30,10)">
+          <rect x="0" y="0" width="60" height="70" rx="16" fill="#FBF8F2" stroke="#24352A" stroke-width="2"/>
+          <path d="M12 0 L12 -10 Q30 -22 48 -10 L48 0" fill="none" stroke="#24352A" stroke-width="2"/>
+          <circle cx="30" cy="30" r="3" fill="#E7A9A0"/>
+          <circle cx="30" cy="42" r="3" fill="#E7A9A0"/>
+        </g>
+      </g>
+      <!-- Sock -->
+      <g transform="translate(230,20) rotate(3)">
+        <circle cx="0" cy="0" r="5" fill="#D9A441"/>
+        <line x1="0" y1="0" x2="0" y2="8" stroke="#D9A441" stroke-width="2"/>
+        <g transform="translate(-18,8)">
+          <path d="M4 0 H32 V38 Q32 52 18 52 Q4 52 4 40 Z" fill="#FBF8F2" stroke="#24352A" stroke-width="2"/>
+          <path d="M4 38 Q4 50 18 50" fill="none" stroke="#E7A9A0" stroke-width="4" stroke-linecap="round"/>
+        </g>
+      </g>
+      <!-- Hat -->
+      <g transform="translate(400,20) rotate(-3)">
+        <circle cx="0" cy="0" r="5" fill="#D9A441"/>
+        <line x1="0" y1="0" x2="0" y2="9" stroke="#D9A441" stroke-width="2"/>
+        <g transform="translate(-26,9)">
+          <path d="M0 34 Q0 0 26 0 Q52 0 52 34 Z" fill="#FBF8F2" stroke="#24352A" stroke-width="2"/>
+          <rect x="-2" y="30" width="56" height="10" rx="5" fill="#E7A9A0" stroke="#24352A" stroke-width="1.5"/>
+          <circle cx="26" cy="4" r="4" fill="#D9A441"/>
+        </g>
+      </g>
+      <!-- Bib -->
+      <g transform="translate(560,20) rotate(4)">
+        <circle cx="0" cy="0" r="5" fill="#D9A441"/>
+        <line x1="0" y1="0" x2="0" y2="10" stroke="#D9A441" stroke-width="2"/>
+        <g transform="translate(-24,10)">
+          <path d="M24 0 C10 0 0 10 0 26 C0 42 10 54 24 54 C38 54 48 42 48 26 C48 10 38 0 24 0 Z" fill="#FBF8F2" stroke="#24352A" stroke-width="2"/>
+          <circle cx="24" cy="10" r="6" fill="none" stroke="#24352A" stroke-width="2"/>
+          <path d="M14 30 Q24 40 34 30" fill="none" stroke="#E7A9A0" stroke-width="3" stroke-linecap="round"/>
+        </g>
+      </g>
+      <!-- Onesie 2 -->
+      <g transform="translate(680,20) rotate(-2)">
+        <circle cx="0" cy="0" r="5" fill="#D9A441"/>
+        <line x1="0" y1="0" x2="0" y2="10" stroke="#D9A441" stroke-width="2"/>
+        <g transform="translate(-26,10)">
+          <rect x="0" y="0" width="52" height="60" rx="14" fill="#FBF8F2" stroke="#24352A" stroke-width="2"/>
+          <path d="M10 0 L10 -8 Q26 -18 42 -8 L42 0" fill="none" stroke="#24352A" stroke-width="2"/>
+        </g>
+      </g>
+    </svg>
+
+    <div class="cta-row">
+      <a href="#catalogo" class="btn-primary">Ver as peças disponíveis</a>
+    </div>
+  </section>
+
+  <section class="catalog-section wrap" id="catalogo">
+    <div class="catalog-head">
+      <h2>No varal agora</h2>
+    </div>
+    <div class="filters" id="filters"></div>
+    <div id="gridWrap"></div>
+  </section>
+</main>
+
+<!-- CART OVERLAY + DRAWER -->
+<div class="overlay" id="overlay" onclick="closeAllPanels()"></div>
+<div class="drawer" id="cartDrawer">
+  <div class="drawer-head">
+    <h2>Sua sacolinha</h2>
+    <button class="icon-btn" onclick="closeCart()">✕</button>
+  </div>
+  <div class="drawer-body" id="cartBody"></div>
+  <div class="drawer-foot">
+    <div class="total-row"><span>Total</span><span class="mono" id="cartTotal">R$ 0,00</span></div>
+    <button class="checkout-btn" id="checkoutBtn" onclick="finalizarPedido()">📲 Enviar pedido pelo WhatsApp</button>
+    <div class="msg" id="checkoutMsg"></div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal" id="productModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-gallery" id="modalGallery"></div>
+    <div class="modal-body">
+      <span class="size-badge" id="modalTamanho"></span>
+      <h2 id="modalNome" style="margin-top:8px;"></h2>
+      <p id="modalDescricao"></p>
+      <div class="price-tag" id="modalPreco" style="font-size:20px; margin-bottom:16px;"></div>
+      <button class="add-btn" id="modalAddBtn" style="width:100%;">Adicionar à sacolinha</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>Feito com carinho para roupinhas com muita história ainda pra contar.</p>
+    <button id="adminToggle" onclick="openAdminGate()">Área da loja</button>
+  </div>
+</footer>
+
+<!-- ADMIN AREA -->
+<div id="adminView" class="hidden">
+  <header style="background:var(--pine);">
+    <div class="wrap">
+      <div class="brand"><span>Área da loja</span></div>
+      <button class="btn-ghost" style="color:var(--linen); border-color:var(--linen);" onclick="exitAdmin()">← Voltar pra loja</button>
+    </div>
+  </header>
+
+  <!-- PIN gate -->
+  <div id="pinGate" class="pin-box wrap hidden">
+    <h2>Digite a senha</h2>
+    <p>Só quem cadastra as peças precisa entrar aqui.</p>
+    <div class="field"><input type="password" id="pinInput" placeholder="Senha da loja"></div>
+    <button class="save-btn" onclick="checkPin()">Entrar</button>
+    <div class="msg err" id="pinMsg"></div>
+  </div>
+
+  <!-- First time setup -->
+  <div id="setupBox" class="admin-panel hidden">
+    <h2>Vamos configurar sua loja</h2>
+    <p class="lead">É rapidinho — só preencha e você já pode começar a cadastrar as roupinhas.</p>
+    <div class="field"><label>Nome da loja</label><input type="text" id="setupNome" placeholder="Ex: Varal do Bebê"></div>
+    <div class="field"><label>Número do WhatsApp para receber os pedidos</label><input type="text" id="setupWhats" placeholder="Ex: 5531999998888 (com DDI e DDD, só números)"></div>
+    <div class="field"><label>Crie uma senha para a área da loja</label><input type="password" id="setupSenha" placeholder="Ex: 1234"></div>
+    <button class="save-btn" onclick="saveSetup()">Salvar e continuar</button>
+    <div class="msg" id="setupMsg"></div>
+  </div>
+
+  <!-- Management panel -->
+  <div id="managePanel" class="admin-panel hidden">
+    <h2>Cadastrar peça nova</h2>
+    <p class="lead">Preencha os dados e adicione até 3 fotos. Quando salvar, a peça já aparece na loja.</p>
+
+    <div class="field"><label>Nome da peça</label><input type="text" id="fNome" placeholder="Ex: Macacão listrado manga longa"></div>
+    <div class="field">
+      <label>Tamanho / idade</label>
+      <select id="fTamanho"></select>
+    </div>
+    <div class="field"><label>Preço (R$)</label><input type="number" id="fPreco" min="0" step="0.01" placeholder="Ex: 25.00"></div>
+    <div class="field"><label>Descrição</label><textarea id="fDescricao" placeholder="Conte o estado da peça, marca, detalhes que ajudam a vender"></textarea></div>
+    <div class="field">
+      <label>Fotos (até 3)</label>
+      <div class="photo-inputs" id="photoInputs"></div>
+    </div>
+    <button class="save-btn" onclick="salvarProduto()">Salvar peça</button>
+    <div class="msg" id="formMsg"></div>
+
+    <div class="admin-card-list">
+      <h2 style="font-size:19px; margin-bottom:14px;">Peças cadastradas</h2>
+      <div id="adminList"></div>
+    </div>
+
+    <div style="margin-top:30px; border-top:1px solid var(--line); padding-top:18px;">
+      <button class="link-btn" onclick="openConfigEdit()">Editar nome da loja, WhatsApp ou senha</button>
+    </div>
+
+    <div id="configEdit" class="hidden" style="margin-top:16px;">
+      <div class="field"><label>Nome da loja</label><input type="text" id="cfgNome"></div>
+      <div class="field"><label>WhatsApp</label><input type="text" id="cfgWhats"></div>
+      <div class="field"><label>Senha</label><input type="password" id="cfgSenha"></div>
+      <button class="save-btn" onclick="saveConfigEdit()">Salvar alterações</button>
+      <div class="msg" id="cfgMsg"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TAMANHOS = ['RN','0-3 meses','3-6 meses','6-9 meses','9-12 meses','12-18 meses','18-24 meses','2 anos','3 anos','4 anos'];
+
+let produtos = [];
+let cart = [];
+let config = null;
+let currentModalProduct = null;
+let pendingPhotos = [null, null, null];
+
+// ---------- STORAGE HELPERS ----------
+async function safeGet(key, shared){
+  try{
+    const r = await window.storage.get(key, shared);
+    return r ? r.value : null;
+  }catch(e){ return null; }
+}
+async function loadIds(){
+  const v = await safeGet('bazar_ids', true);
+  if(!v) return [];
+  try{ return JSON.parse(v); }catch(e){ return []; }
+}
+async function saveIds(ids){
+  await window.storage.set('bazar_ids', JSON.stringify(ids), true);
+}
+async function loadProduct(id){
+  const v = await safeGet('bazar_produto_'+id, true);
+  if(!v) return null;
+  try{ return JSON.parse(v); }catch(e){ return null; }
+}
+async function saveProductStorage(p){
+  await window.storage.set('bazar_produto_'+p.id, JSON.stringify(p), true);
+}
+async function deleteProductStorage(id){
+  try{ await window.storage.delete('bazar_produto_'+id, true); }catch(e){}
+}
+async function loadConfig(){
+  const v = await safeGet('bazar_config', true);
+  if(!v) return null;
+  try{ return JSON.parse(v); }catch(e){ return null; }
+}
+async function saveConfigStorage(c){
+  await window.storage.set('bazar_config', JSON.stringify(c), true);
+}
+
+// ---------- UTIL ----------
+function uid(){ return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function formatBRL(n){ return 'R$ ' + Number(n).toFixed(2).replace('.', ','); }
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function compressImage(file, maxW=900, quality=0.65){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        let w = img.width, h = img.height;
+        if(w > maxW){ h = Math.round(h * (maxW/w)); w = maxW; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+function placeholderIconSVG(){
+  return `<svg viewBox="0 0 24 24" width="40%" height="40%" fill="none"><path d="M8 3.5C8 2.67 8.67 2 9.5 2h5C15.33 2 16 2.67 16 3.5V5l4.5 3.2c.6.43.85 1.2.6 1.88l-.9 2.4a1 1 0 0 1-1.35.56L16 11.5V19c0 1.66-1.79 3-4 3s-4-1.34-4-3v-7.5l-2.85 1.54a1 1 0 0 1-1.35-.56l-.9-2.4c-.25-.68 0-1.45.6-1.88L8 5V3.5Z" stroke="#6B7F6C" stroke-width="1.4" stroke-linejoin="round"/></svg>`;
+}
+
+// ---------- INIT ----------
+async function init(){
+  config = await loadConfig();
+  if(config && config.nome){
+    document.getElementById('storeNameHeader').textContent = config.nome;
+    document.title = config.nome + ' — Bazar de roupinhas usadas';
+  }
+  await refreshCatalog();
+}
+
+async function refreshCatalog(){
+  const ids = await loadIds();
+  const loaded = await Promise.all(ids.map(loadProduct));
+  produtos = loaded.filter(Boolean);
+  renderFilters();
+  renderGrid('Todos');
+}
+
+// ---------- PUBLIC: FILTERS + GRID ----------
+function renderFilters(){
+  const sizesPresent = TAMANHOS.filter(t => produtos.some(p => p.tamanho === t));
+  const wrap = document.getElementById('filters');
+  wrap.innerHTML = '';
+  const chips = ['Todos', ...sizesPresent];
+  chips.forEach(t=>{
+    const b = document.createElement('button');
+    b.className = 'tag-chip' + (t === (wrap.dataset.active || 'Todos') ? ' active' : '');
+    b.textContent = t;
+    b.onclick = ()=>{
+      wrap.dataset.active = t;
+      [...wrap.children].forEach(c=>c.classList.remove('active'));
+      b.classList.add('active');
+      renderGrid(t);
+    };
+    wrap.appendChild(b);
+  });
+  if(!wrap.dataset.active) wrap.dataset.active = 'Todos';
+}
+
+function renderGrid(filtro){
+  const gridWrap = document.getElementById('gridWrap');
+  const lista = filtro === 'Todos' ? produtos : produtos.filter(p=>p.tamanho === filtro);
+  if(lista.length === 0){
+    gridWrap.innerHTML = `<div class="empty-state">
+      <h3>O varal ainda tá vazio por aqui</h3>
+      <p>Assim que a loja cadastrar peças desse tamanho, elas aparecem nesse espaço.</p>
+    </div>`;
+    return;
+  }
+  gridWrap.innerHTML = `<div class="grid">${lista.map(p=>`
+    <div class="card">
+      <div class="card-photo" onclick="openModal('${p.id}')">
+        ${p.fotos && p.fotos[0] ? `<img src="${p.fotos[0]}" alt="${p.nome}">` : placeholderIconSVG()}
+      </div>
+      <div class="card-body">
+        <span class="size-badge">${p.tamanho}</span>
+        <h3 onclick="openModal('${p.id}')">${p.nome}</h3>
+        <div class="price-tag">${formatBRL(p.preco)}</div>
+        <button class="add-btn" onclick="addToCart('${p.id}')">Adicionar à sacolinha</button>
+      </div>
+    </div>
+  `).join('')}</div>`;
+}
+
+// ---------- PRODUCT MODAL ----------
+function openModal(id){
+  const p = produtos.find(x=>x.id===id);
+  if(!p) return;
+  currentModalProduct = p;
+  document.getElementById('modalTamanho').textContent = p.tamanho;
+  document.getElementById('modalNome').textContent = p.nome;
+  document.getElementById('modalDescricao').textContent = p.descricao || 'Sem descrição adicionada.';
+  document.getElementById('modalPreco').textContent = formatBRL(p.preco);
+  const gal = document.getElementById('modalGallery');
+  gal.innerHTML = (p.fotos && p.fotos.length) ? p.fotos.map(f=>`<img src="${f}">`).join('') : '';
+  document.getElementById('modalAddBtn').onclick = ()=>{ addToCart(p.id); closeModal(); };
+  document.getElementById('productModal').classList.add('show');
+  document.getElementById('overlay').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('productModal').classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
+}
+function closeAllPanels(){
+  closeModal();
+  closeCart();
+}
+
+// ---------- CART ----------
+function addToCart(id){
+  const p = produtos.find(x=>x.id===id);
+  if(!p) return;
+  cart.push({id:p.id, nome:p.nome, preco:p.preco, tamanho:p.tamanho, foto: p.fotos && p.fotos[0]});
+  renderCart();
+  toast('Peça adicionada à sacolinha 🧺');
+}
+function removeFromCart(idx){
+  cart.splice(idx,1);
+  renderCart();
+}
+function renderCart(){
+  document.getElementById('cartCount').textContent = cart.length;
+  const body = document.getElementById('cartBody');
+  if(cart.length === 0){
+    body.innerHTML = `<div class="empty-state" style="padding:40px 16px;"><h3 style="font-size:16px;">Sua sacolinha tá vazia</h3><p style="font-size:13.5px;">Escolha uma peça lá no varal!</p></div>`;
+  } else {
+    body.innerHTML = cart.map((c,i)=>`
+      <div class="cart-item">
+        ${c.foto ? `<img src="${c.foto}">` : `<div style="width:56px;height:56px;border-radius:10px;background:var(--sage);"></div>`}
+        <div class="info">
+          <h4>${c.nome}</h4>
+          <span class="size-badge">${c.tamanho}</span>
+          <div class="price-tag" style="font-size:14px; margin-top:4px;">${formatBRL(c.preco)}</div>
+        </div>
+        <button class="remove" onclick="removeFromCart(${i})">remover</button>
+      </div>
+    `).join('');
+  }
+  const total = cart.reduce((s,c)=>s+Number(c.preco),0);
+  document.getElementById('cartTotal').textContent = formatBRL(total);
+  const btn = document.getElementById('checkoutBtn');
+  const msg = document.getElementById('checkoutMsg');
+  if(cart.length === 0){
+    btn.disabled = true; msg.textContent = '';
+  } else if(!config || !config.whatsapp){
+    btn.disabled = true;
+    msg.textContent = 'A loja ainda não configurou o WhatsApp para receber pedidos.';
+    msg.className = 'msg err';
+  } else {
+    btn.disabled = false; msg.textContent = '';
+  }
+}
+function openCart(){
+  renderCart();
+  document.getElementById('cartDrawer').classList.add('show');
+  document.getElementById('overlay').classList.add('show');
+}
+function closeCart(){
+  document.getElementById('cartDrawer').classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
+}
+function finalizarPedido(){
+  if(cart.length === 0 || !config || !config.whatsapp) return;
+  const nomeLoja = config.nome || 'a loja';
+  let msg = `Olá! Vim pelo site do ${nomeLoja} e quero comprar:\n\n`;
+  cart.forEach(c=>{
+    msg += `• ${c.nome} (${c.tamanho}) — ${formatBRL(c.preco)}\n`;
+  });
+  const total = cart.reduce((s,c)=>s+Number(c.preco),0);
+  msg += `\nTotal: ${formatBRL(total)}\n\nAguardo a confirmação, obrigado(a)!`;
+  const url = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+
+// ---------- ADMIN ----------
+async function openAdminGate(){
+  document.getElementById('publicView').classList.add('hidden');
+  document.querySelector('header').classList.add('hidden');
+  document.querySelector('footer').classList.add('hidden');
+  document.getElementById('adminView').classList.remove('hidden');
+  config = await loadConfig();
+  if(!config || !config.nome){
+    document.getElementById('pinGate').classList.add('hidden');
+    document.getElementById('managePanel').classList.add('hidden');
+    document.getElementById('setupBox').classList.remove('hidden');
+  } else {
+    document.getElementById('setupBox').classList.add('hidden');
+    document.getElementById('managePanel').classList.add('hidden');
+    document.getElementById('pinGate').classList.remove('hidden');
+  }
+}
+function exitAdmin(){
+  document.getElementById('adminView').classList.add('hidden');
+  document.getElementById('publicView').classList.remove('hidden');
+  document.querySelector('header').classList.remove('hidden');
+  document.querySelector('footer').classList.remove('hidden');
+}
+async function saveSetup(){
+  const nome = document.getElementById('setupNome').value.trim();
+  const whats = document.getElementById('setupWhats').value.trim().replace(/\D/g,'');
+  const senha = document.getElementById('setupSenha').value.trim();
+  const msgEl = document.getElementById('setupMsg');
+  if(!nome || !whats || !senha){
+    msgEl.className='msg err'; msgEl.textContent='Preencha todos os campos para continuar.'; return;
+  }
+  config = {nome, whatsapp: whats, senha};
+  await saveConfigStorage(config);
+  document.getElementById('storeNameHeader').textContent = nome;
+  document.title = nome + ' — Bazar de roupinhas usadas';
+  msgEl.className='msg ok'; msgEl.textContent='Loja configurada!';
+  await enterManagePanel();
+}
+async function checkPin(){
+  const val = document.getElementById('pinInput').value.trim();
+  const msgEl = document.getElementById('pinMsg');
+  if(val === config.senha){
+    document.getElementById('pinInput').value='';
+    msgEl.textContent='';
+    await enterManagePanel();
+  } else {
+    msgEl.textContent = 'Senha incorreta, tenta de novo.';
+  }
+}
+async function enterManagePanel(){
+  document.getElementById('setupBox').classList.add('hidden');
+  document.getElementById('pinGate').classList.add('hidden');
+  document.getElementById('managePanel').classList.remove('hidden');
+  buildTamanhoSelect();
+  buildPhotoInputs();
+  await renderAdminList();
+}
+function buildTamanhoSelect(){
+  const sel = document.getElementById('fTamanho');
+  sel.innerHTML = TAMANHOS.map(t=>`<option value="${t}">${t}</option>`).join('');
+}
+function buildPhotoInputs(){
+  pendingPhotos = [null,null,null];
+  const wrap = document.getElementById('photoInputs');
+  wrap.innerHTML = '';
+  for(let i=0;i<3;i++){
+    const slot = document.createElement('div');
+    slot.className = 'photo-slot';
+    slot.id = 'slot'+i;
+    slot.innerHTML = `<span>+ foto</span><input type="file" accept="image/*" onchange="handlePhoto(${i}, this)">`;
+    wrap.appendChild(slot);
+  }
+}
+async function handlePhoto(i, input){
+  const file = input.files[0];
+  if(!file) return;
+  const dataUrl = await compressImage(file);
+  pendingPhotos[i] = dataUrl;
+  const slot = document.getElementById('slot'+i);
+  slot.innerHTML = `<img src="${dataUrl}"><button type="button" class="rm" onclick="event.stopPropagation(); clearPhoto(${i})">✕</button>`;
+}
+function clearPhoto(i){
+  pendingPhotos[i] = null;
+  const slot = document.getElementById('slot'+i);
+  slot.innerHTML = `<span>+ foto</span><input type="file" accept="image/*" onchange="handlePhoto(${i}, this)">`;
+}
+async function salvarProduto(){
+  const nome = document.getElementById('fNome').value.trim();
+  const tamanho = document.getElementById('fTamanho').value;
+  const preco = parseFloat(document.getElementById('fPreco').value);
+  const descricao = document.getElementById('fDescricao').value.trim();
+  const fotos = pendingPhotos.filter(Boolean);
+  const msgEl = document.getElementById('formMsg');
+
+  if(!nome || isNaN(preco) || preco < 0){
+    msgEl.className='msg err'; msgEl.textContent='Preencha ao menos o nome e um preço válido.'; return;
+  }
+  if(fotos.length === 0){
+    msgEl.className='msg err'; msgEl.textContent='Adicione pelo menos 1 foto da peça.'; return;
+  }
+
+  const p = {id: uid(), nome, tamanho, preco, descricao, fotos};
+  await saveProductStorage(p);
+  const ids = await loadIds();
+  ids.push(p.id);
+  await saveIds(ids);
+
+  document.getElementById('fNome').value='';
+  document.getElementById('fPreco').value='';
+  document.getElementById('fDescricao').value='';
+  buildPhotoInputs();
+  msgEl.className='msg ok'; msgEl.textContent='Peça salva com sucesso!';
+  toast('Peça cadastrada!');
+
+  await refreshCatalog();
+  await renderAdminList();
+}
+async function renderAdminList(){
+  const ids = await loadIds();
+  const loaded = await Promise.all(ids.map(loadProduct));
+  const list = loaded.filter(Boolean);
+  const wrap = document.getElementById('adminList');
+  if(list.length === 0){
+    wrap.innerHTML = `<p style="color:var(--moss); font-size:14px;">Nenhuma peça cadastrada ainda.</p>`;
+    return;
+  }
+  wrap.innerHTML = list.map(p=>`
+    <div class="admin-item">
+      ${p.fotos && p.fotos[0] ? `<img src="${p.fotos[0]}">` : `<div style="width:52px;height:52px;border-radius:8px;background:var(--sage);"></div>`}
+      <div class="i"><b>${p.nome}</b><span>${p.tamanho} · ${formatBRL(p.preco)}</span></div>
+      <button class="del-btn" onclick="removerProduto('${p.id}')">Remover</button>
+    </div>
+  `).join('');
+}
+async function removerProduto(id){
+  await deleteProductStorage(id);
+  const ids = (await loadIds()).filter(x=>x!==id);
+  await saveIds(ids);
+  await refreshCatalog();
+  await renderAdminList();
+  toast('Peça removida.');
+}
+function openConfigEdit(){
+  const box = document.getElementById('configEdit');
+  box.classList.toggle('hidden');
+  if(!box.classList.contains('hidden')){
+    document.getElementById('cfgNome').value = config.nome || '';
+    document.getElementById('cfgWhats').value = config.whatsapp || '';
+    document.getElementById('cfgSenha').value = config.senha || '';
+  }
+}
+async function saveConfigEdit(){
+  const nome = document.getElementById('cfgNome').value.trim();
+  const whats = document.getElementById('cfgWhats').value.trim().replace(/\D/g,'');
+  const senha = document.getElementById('cfgSenha').value.trim();
+  const msgEl = document.getElementById('cfgMsg');
+  if(!nome || !whats || !senha){
+    msgEl.className='msg err'; msgEl.textContent='Preencha todos os campos.'; return;
+  }
+  config = {nome, whatsapp: whats, senha};
+  await saveConfigStorage(config);
+  document.getElementById('storeNameHeader').textContent = nome;
+  document.title = nome + ' — Bazar de roupinhas usadas';
+  msgEl.className='msg ok'; msgEl.textContent='Configurações atualizadas!';
+  toast('Configurações salvas!');
+}
+
+init();
+</script>
+</body>
+</html>
