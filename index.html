@@ -470,7 +470,22 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script>
+// ---------- FIREBASE ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyBOE6E4iVzVMJBtOWmeqqdw-nQ0NGsbTvY",
+  authDomain: "roupinhas-da-isa.firebaseapp.com",
+  projectId: "roupinhas-da-isa",
+  storageBucket: "roupinhas-da-isa.firebasestorage.app",
+  messagingSenderId: "460431576293",
+  appId: "1:460431576293:web:da44bb8702192d76d4d80c",
+  measurementId: "G-SNVK2F7WNW"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 const TAMANHOS = ['RN','0-3 meses','3-6 meses','6-9 meses','9-12 meses','12-18 meses','18-24 meses','2 anos','3 anos','4 anos'];
 
 let produtos = [];
@@ -479,39 +494,34 @@ let config = null;
 let currentModalProduct = null;
 let pendingPhotos = [null, null, null];
 
-// ---------- STORAGE HELPERS ----------
-async function safeGet(key, shared){
-  try{
-    const r = await window.storage.get(key, shared);
-    return r ? r.value : null;
-  }catch(e){ return null; }
-}
+// ---------- STORAGE HELPERS (Firestore) ----------
 async function loadIds(){
-  const v = await safeGet('bazar_ids', true);
-  if(!v) return [];
-  try{ return JSON.parse(v); }catch(e){ return []; }
-}
-async function saveIds(ids){
-  await window.storage.set('bazar_ids', JSON.stringify(ids), true);
+  try{
+    const snap = await db.collection('produtos').get();
+    return snap.docs.map(d=>d.id);
+  }catch(e){ console.error(e); return []; }
 }
 async function loadProduct(id){
-  const v = await safeGet('bazar_produto_'+id, true);
-  if(!v) return null;
-  try{ return JSON.parse(v); }catch(e){ return null; }
+  try{
+    const doc = await db.collection('produtos').doc(id).get();
+    return doc.exists ? {id: doc.id, ...doc.data()} : null;
+  }catch(e){ console.error(e); return null; }
 }
 async function saveProductStorage(p){
-  await window.storage.set('bazar_produto_'+p.id, JSON.stringify(p), true);
+  const {id, ...data} = p;
+  await db.collection('produtos').doc(id).set(data);
 }
 async function deleteProductStorage(id){
-  try{ await window.storage.delete('bazar_produto_'+id, true); }catch(e){}
+  try{ await db.collection('produtos').doc(id).delete(); }catch(e){ console.error(e); }
 }
 async function loadConfig(){
-  const v = await safeGet('bazar_config', true);
-  if(!v) return null;
-  try{ return JSON.parse(v); }catch(e){ return null; }
+  try{
+    const doc = await db.collection('config').doc('loja').get();
+    return doc.exists ? doc.data() : null;
+  }catch(e){ console.error(e); return null; }
 }
 async function saveConfigStorage(c){
-  await window.storage.set('bazar_config', JSON.stringify(c), true);
+  await db.collection('config').doc('loja').set(c);
 }
 
 // ---------- UTIL ----------
@@ -523,7 +533,7 @@ function toast(msg){
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 2200);
 }
-function compressImage(file, maxW=900, quality=0.65){
+function compressImage(file, maxW=760, quality=0.55){
   return new Promise((resolve, reject)=>{
     const reader = new FileReader();
     reader.onload = (e)=>{
@@ -802,11 +812,8 @@ async function salvarProduto(){
     msgEl.className='msg err'; msgEl.textContent='Adicione pelo menos 1 foto da peça.'; return;
   }
 
-  const p = {id: uid(), nome, tamanho, preco, descricao, fotos};
+  const p = {id: uid(), nome, tamanho, preco, descricao, fotos, createdAt: Date.now()};
   await saveProductStorage(p);
-  const ids = await loadIds();
-  ids.push(p.id);
-  await saveIds(ids);
 
   document.getElementById('fNome').value='';
   document.getElementById('fPreco').value='';
@@ -837,8 +844,6 @@ async function renderAdminList(){
 }
 async function removerProduto(id){
   await deleteProductStorage(id);
-  const ids = (await loadIds()).filter(x=>x!==id);
-  await saveIds(ids);
   await refreshCatalog();
   await renderAdminList();
   toast('Peça removida.');
